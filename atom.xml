@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>unqyan&#39;s blog</title>
+  
+  
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2023-11-30T02:26:00.312Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>BoShuaiYan</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://example.com/2023/11/30/Leetcode2681.%E8%8B%B1%E9%9B%84%E7%9A%84%E5%8A%9B%E9%87%8F/"/>
+    <id>http://example.com/2023/11/30/Leetcode2681.%E8%8B%B1%E9%9B%84%E7%9A%84%E5%8A%9B%E9%87%8F/</id>
+    <published>2023-11-30T02:26:00.312Z</published>
+    <updated>2023-11-30T02:26:00.312Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Leetcode2681-英雄的力量"><a href="#Leetcode2681-英雄的力量" class="headerlink" title="Leetcode2681.英雄的力量"></a>Leetcode2681.英雄的力量</h3><p><a href="https://leetcode.cn/problems/power-of-heroes/">2681. 英雄的力量 - 力扣（LeetCode）</a></p><h4 id="1-动态规划-前缀和"><a href="#1-动态规划-前缀和" class="headerlink" title="1.动态规划 + 前缀和"></a>1.动态规划 + 前缀和</h4><p>​考虑如何计算一个nums [i]，0 &lt; i &lt; n，由于数组已经排好序，所以以nums [i] 结尾的子序列的最大值就是nums [i]，所以可以只考虑所有子序列的最小值之和。设dp [ j ] 表示以 nums [ j ] 结尾的所有子序列最小值之和，得到以下式子</p><p>​                                                     <img src="C:\Users\23694\AppData\Roaming\Typora\typora-user-images\image-20230801220232039.png" alt="image-20230801220232039"></p><p>​那么以nums [i] 结尾的全部子序列的英雄组力量和为 nums [i] * nums [i] * dp [i]</p><p>​计算dp [i] 需要 O (n) 的复杂度，总体复杂度为 n² ，会超时。所以可以使用前缀和数组prefix 进行优化</p><p>​prefix [i+1] &#x3D; prefix[i] + dp[i]</p><p>​初始式就可以优化为：</p><p>​ <img src="C:\Users\23694\AppData\Roaming\Typora\typora-user-images\image-20230801220713005.png" alt="image-20230801220713005"></p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">sumOfPower</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> nums.length;</span><br><span class="line">        <span class="comment">// 表示以i结尾的所有子序列的最小值之和</span></span><br><span class="line">        <span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">        <span class="type">int</span>[] prefix = <span class="keyword">new</span> <span class="title class_">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="type">int</span> <span class="variable">mod</span> <span class="operator">=</span> <span class="number">1000000007</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span> ; i &lt; n ; i ++) &#123;</span><br><span class="line">            dp[i] = (nums[i] + prefix[i]) % mod;</span><br><span class="line">            prefix[i + <span class="number">1</span>] = (prefix[i] + dp[i]) % mod;</span><br><span class="line">            res = (<span class="type">int</span>)((res + (<span class="type">long</span>) nums[i] * nums[i] % mod * dp[i]) % mod);</span><br><span class="line">            <span class="keyword">if</span> (res &lt; <span class="number">0</span>) res += mod;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="2-滚动数组优化版"><a href="#2-滚动数组优化版" class="headerlink" title="2.滚动数组优化版"></a>2.滚动数组优化版</h4><p>​因为dp [i] 和 prefix [i] 的计算只与前一个状态有关，所以可以使用滚动数组来优化</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">sumOfPower</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        <span class="type">int</span> <span class="variable">dp</span> <span class="operator">=</span> <span class="number">0</span>, preSum = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">res</span> <span class="operator">=</span> <span class="number">0</span>, mod = <span class="number">1000000007</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            dp = (nums[i] + preSum) % mod;</span><br><span class="line">            preSum = (preSum + dp) % mod;</span><br><span class="line">            res = (<span class="type">int</span>) ((res + (<span class="type">long</span>) nums[i] * nums[i] % mod * dp) % mod);</span><br><span class="line">            <span class="keyword">if</span> (res &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                res += mod;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h3 id=&quot;Leetcode2681-英雄的力量&quot;&gt;&lt;a href=&quot;#Leetcode2681-英雄的力量&quot; class=&quot;headerlink&quot; title=&quot;Leetcode2681.英雄的力量&quot;&gt;&lt;/a&gt;Leetcode2681.英雄的力量&lt;/h3&gt;&lt;p&gt;&lt;a hre</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>first_post</title>
+    <link href="http://example.com/2023/11/30/first-post/"/>
+    <id>http://example.com/2023/11/30/first-post/</id>
+    <published>2023-11-30T02:22:31.000Z</published>
+    <updated>2023-11-30T02:22:31.846Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://example.com/2023/11/30/hello-world/"/>
+    <id>http://example.com/2023/11/30/hello-world/</id>
+    <published>2023-11-30T01:48:51.241Z</published>
+    <updated>2023-11-30T01:48:51.241Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt; for</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
